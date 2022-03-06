@@ -1,0 +1,34 @@
+version: '3.9'
+
+volumes:
+  pg-data:
+
+x-postgres-vars: &postgres-vars
+  POSTGRES_USER: laravel
+  POSTGRES_PASSWORD: laravel
+  POSTGRES_DB: laravel
+
+x-postgres-conn-vars: &postgres-conn-vars
+  <<: *postgres-vars
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: 5432
+
+
+services:
+  postgres:
+    container_name: laravel-ganttastic-postgres
+    image: postgis/postgis:14-master
+    environment:
+      <<: *postgres-vars
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  laravel:
+    container_name: laravel-ganttastic-laravel
+    build:
+      context: .
+      target: dev
+    image: laravel-ganttastic
+    environment:
+      <<: *postgres-conn-vars
+    depends_on: [ postgres ]
